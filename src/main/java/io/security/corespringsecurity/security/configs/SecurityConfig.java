@@ -29,9 +29,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication().withUser("admin").password(password).roles("USER","MANAGER","ADMIN");
     }*/
 
-    @Autowired
-    private AuthenticationDetailsSource authenticationDetailsSource;
-
     @Bean
     public AuthenticationProvider authenticationProvider() {
         return new CustomAuthenticationProvider();
@@ -76,7 +73,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/login_proc")
-                .authenticationDetailsSource(authenticationDetailsSource)
                 .defaultSuccessUrl("/")
                 ;
 
