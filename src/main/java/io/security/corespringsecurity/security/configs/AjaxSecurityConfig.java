@@ -1,7 +1,10 @@
 package io.security.corespringsecurity.security.configs;
 
 import io.security.corespringsecurity.security.filter.AjaxLoginProcessingFilter;
+import io.security.corespringsecurity.security.handler.AjaxAuthenticationFailureHandler;
+import io.security.corespringsecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import io.security.corespringsecurity.security.provider.AjaxAuthenticationProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -14,6 +17,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Order(0)
 public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
+    AjaxAuthenticationSuccessHandler ajaxAuthenticationSuccessHandler;
+
+    @Autowired
+    AjaxAuthenticationFailureHandler ajaxAuthenticationFailureHandler;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -29,8 +37,12 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
     public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
         AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
         ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManagerBean());
+        ajaxLoginProcessingFilter.setAuthenticationSuccessHandler(ajaxAuthenticationSuccessHandler);
+        ajaxLoginProcessingFilter.setAuthenticationFailureHandler(ajaxAuthenticationFailureHandler);
         return ajaxLoginProcessingFilter;
     }
+
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -40,6 +52,7 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
+
         ;
 
         http.csrf().disable();
